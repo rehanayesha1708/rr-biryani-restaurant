@@ -1,11 +1,13 @@
 'use client'
 
-import { Suspense, useRef } from 'react'
+import { Suspense, useRef, useState, useEffect } from 'react'
 import { Canvas, useFrame } from '@react-three/fiber'
 import { OrbitControls, PerspectiveCamera, useTexture } from '@react-three/drei'
 import * as THREE from 'three'
 import { motion } from 'framer-motion'
-import { ChevronDown, Sparkles } from 'lucide-react'
+import { ChevronDown, Sparkles, AlertTriangle } from 'lucide-react'
+import SceneLoader from './SceneLoader'
+import { ErrorBoundary } from './ErrorBoundary'
 
 function BiryaniBowl() {
   const groupRef = useRef<THREE.Group>(null)
@@ -144,12 +146,55 @@ function Scene() {
   )
 }
 
+function SceneError() {
+  return (
+    <div className="absolute inset-0 flex items-center justify-center bg-primary-dark">
+      <div className="text-center px-4 max-w-md">
+        <div className="flex items-center justify-center mb-6">
+          <div className="w-20 h-20 bg-red-500/10 rounded-full flex items-center justify-center">
+            <AlertTriangle className="text-red-500" size={40} />
+          </div>
+        </div>
+        <h3 className="text-xl font-playfair font-bold text-text-primary mb-2">
+          3D Scene Failed to Load
+        </h3>
+        <p className="text-text-secondary mb-6">
+          Sorry, we couldn&apos;t load the 3D experience. Please refresh the page to try again.
+        </p>
+        <button
+          onClick={() => window.location.reload()}
+          className="btn-primary"
+        >
+          Refresh Page
+        </button>
+      </div>
+    </div>
+  )
+}
+
 export default function Hero3D() {
+  const [isClient, setIsClient] = useState(false)
+
+  useEffect(() => {
+    setIsClient(true)
+  }, [])
+
   const scrollToMenu = () => {
     const menuSection = document.querySelector('#menu')
     if (menuSection) {
       menuSection.scrollIntoView({ behavior: 'smooth' })
     }
+  }
+
+  if (!isClient) {
+    return (
+      <section
+        id="home"
+        className="relative h-screen w-full overflow-hidden bg-gradient-to-b from-primary-dark via-secondary-dark to-primary-dark"
+      >
+        <SceneLoader message="Preparing your experience..." />
+      </section>
+    )
   }
 
   return (
@@ -158,11 +203,17 @@ export default function Hero3D() {
       className="relative h-screen w-full overflow-hidden bg-gradient-to-b from-primary-dark via-secondary-dark to-primary-dark"
     >
       <div className="absolute inset-0 z-0">
-        <Canvas shadows>
-          <Suspense fallback={null}>
-            <Scene />
-          </Suspense>
-        </Canvas>
+        <ErrorBoundary fallback={<SceneError />}>
+          <Canvas
+            shadows
+            dpr={[1, 2]}
+            performance={{ min: 0.5 }}
+          >
+            <Suspense fallback={<SceneLoader />}>
+              <Scene />
+            </Suspense>
+          </Canvas>
+        </ErrorBoundary>
       </div>
 
       <div className="absolute inset-0 z-10 flex items-center justify-center">
