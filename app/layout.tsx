@@ -2,23 +2,40 @@ import type { Metadata } from 'next'
 import './globals.css'
 
 export const metadata: Metadata = {
+  metadataBase: new URL('https://rrbiryani.com'),
   title: 'RR Biryani & Family Restaurant - Authentic Indian Cuisine',
-  description: 'Experience the finest authentic Indian biryani and family dishes. Premium dining with traditional flavors and modern ambiance.',
-  keywords: 'biryani, Indian restaurant, family restaurant, authentic cuisine, hyderabadi biryani, Indian food',
+  description: 'Experience the finest authentic Indian biryani and family dishes. Premium dining with traditional flavors and modern ambiance. Order online or visit us today!',
+  keywords: 'biryani, Indian restaurant, family restaurant, authentic cuisine, hyderabadi biryani, Indian food, order online, best biryani',
   authors: [{ name: 'RR Biryani Restaurant' }],
   openGraph: {
-    title: 'RR Biryani & Family Restaurant',
-    description: 'Experience the finest authentic Indian biryani and family dishes.',
+    title: 'RR Biryani & Family Restaurant - Authentic Indian Cuisine',
+    description: 'Experience the finest authentic Indian biryani and family dishes. Premium dining with traditional flavors.',
     type: 'website',
     locale: 'en_US',
     siteName: 'RR Biryani Restaurant',
+    url: 'https://rrbiryani.com',
+    images: [
+      {
+        url: '/og-image.jpg',
+        width: 1200,
+        height: 630,
+        alt: 'RR Biryani & Family Restaurant',
+      },
+    ],
   },
   twitter: {
     card: 'summary_large_image',
     title: 'RR Biryani & Family Restaurant',
     description: 'Experience the finest authentic Indian biryani and family dishes.',
+    images: ['/og-image.jpg'],
   },
   robots: 'index, follow',
+  alternates: {
+    canonical: 'https://rrbiryani.com',
+  },
+  verification: {
+    google: 'your-google-verification-code',
+  },
 }
 
 export const viewport = {
@@ -36,6 +53,7 @@ export default function RootLayout({
     <html lang="en" className="dark">
       <head>
         <link rel="icon" href="/favicon.ico" />
+        <link rel="manifest" href="/manifest.json" />
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{

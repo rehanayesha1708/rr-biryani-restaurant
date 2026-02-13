@@ -8,8 +8,11 @@ import dynamic from 'next/dynamic'
 const MapWithNoSSR = dynamic(() => import('./Map'), {
   ssr: false,
   loading: () => (
-    <div className="h-[400px] bg-secondary-dark rounded-2xl flex items-center justify-center">
-      <p className="text-text-secondary">Loading map...</p>
+    <div className="h-[400px] bg-secondary-dark rounded-2xl flex items-center justify-center gold-border">
+      <div className="text-center">
+        <MapPin className="text-accent-gold mx-auto mb-2 animate-pulse" size={32} />
+        <p className="text-text-secondary">Loading map...</p>
+      </div>
     </div>
   ),
 })

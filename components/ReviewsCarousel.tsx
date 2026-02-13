@@ -2,7 +2,7 @@
 
 import { useEffect, useRef, useState } from 'react'
 import { motion } from 'framer-motion'
-import { Star, Quote, ChevronLeft, ChevronRight } from 'lucide-react'
+import { Star, Quote, ChevronLeft, ChevronRight, AlertTriangle } from 'lucide-react'
 import { Swiper, SwiperSlide } from 'swiper/react'
 import { Navigation, Pagination, Autoplay } from 'swiper/modules'
 import type { Swiper as SwiperType } from 'swiper'
@@ -77,9 +77,15 @@ const reviews = [
 export default function ReviewsCarousel() {
   const swiperRef = useRef<SwiperType>()
   const [isClient, setIsClient] = useState(false)
+  const [swiperError, setSwiperError] = useState(false)
 
   useEffect(() => {
-    setIsClient(true)
+    try {
+      setIsClient(true)
+    } catch (error) {
+      console.error('Failed to initialize Swiper:', error)
+      setSwiperError(true)
+    }
   }, [])
 
   return (
@@ -111,7 +117,51 @@ export default function ReviewsCarousel() {
           transition={{ duration: 0.6, delay: 0.2 }}
           className="relative"
         >
-          {isClient && (
+          {swiperError ? (
+            <div className="text-center py-12">
+              <AlertTriangle className="text-accent-gold mx-auto mb-4" size={48} />
+              <p className="text-text-secondary mb-6">Reviews carousel temporarily unavailable</p>
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                {reviews.slice(0, 3).map((review) => (
+                  <div key={review.id} className="bg-primary-dark rounded-2xl p-8 gold-border h-full flex flex-col">
+                    <div className="flex items-start justify-between mb-6">
+                      <div className="flex items-center space-x-4">
+                        <div className="w-14 h-14 bg-accent-gold rounded-full flex items-center justify-center">
+                          <span className="text-xl font-bold text-primary-dark">
+                            {review.avatar}
+                          </span>
+                        </div>
+                        <div>
+                          <h4 className="font-semibold text-text-primary">
+                            {review.name}
+                          </h4>
+                          <p className="text-text-secondary text-sm">{review.location}</p>
+                        </div>
+                      </div>
+                      <Quote className="text-accent-gold/30" size={32} />
+                    </div>
+
+                    <div className="flex items-center space-x-1 mb-4">
+                      {[...Array(review.rating)].map((_, i) => (
+                        <Star
+                          key={i}
+                          className="text-accent-gold"
+                          size={18}
+                          fill="currentColor"
+                        />
+                      ))}
+                    </div>
+
+                    <p className="text-text-secondary leading-relaxed mb-4 flex-grow">
+                      {review.review}
+                    </p>
+
+                    <p className="text-text-secondary text-sm">{review.date}</p>
+                  </div>
+                ))}
+              </div>
+            </div>
+          ) : isClient ? (
             <Swiper
               modules={[Navigation, Pagination, Autoplay]}
               spaceBetween={30}
@@ -177,24 +227,34 @@ export default function ReviewsCarousel() {
                 </SwiperSlide>
               ))}
             </Swiper>
+          ) : (
+            <div className="text-center py-12">
+              <div className="animate-pulse">
+                <div className="h-48 bg-secondary-dark rounded-2xl mb-4"></div>
+                <div className="h-8 bg-secondary-dark rounded w-1/4 mx-auto mb-4"></div>
+                <div className="h-4 bg-secondary-dark rounded w-1/2 mx-auto"></div>
+              </div>
+            </div>
           )}
 
-          <div className="flex items-center justify-center space-x-4 mt-8">
-            <button
-              onClick={() => swiperRef.current?.slidePrev()}
-              className="w-12 h-12 bg-accent-gold/10 hover:bg-accent-gold hover:text-primary-dark text-accent-gold rounded-full flex items-center justify-center transition-all duration-300 hover:shadow-gold"
-              aria-label="Previous review"
-            >
-              <ChevronLeft size={24} />
-            </button>
-            <button
-              onClick={() => swiperRef.current?.slideNext()}
-              className="w-12 h-12 bg-accent-gold/10 hover:bg-accent-gold hover:text-primary-dark text-accent-gold rounded-full flex items-center justify-center transition-all duration-300 hover:shadow-gold"
-              aria-label="Next review"
-            >
-              <ChevronRight size={24} />
-            </button>
-          </div>
+          {isClient && !swiperError && (
+            <div className="flex items-center justify-center space-x-4 mt-8">
+              <button
+                onClick={() => swiperRef.current?.slidePrev()}
+                className="w-12 h-12 bg-accent-gold/10 hover:bg-accent-gold hover:text-primary-dark text-accent-gold rounded-full flex items-center justify-center transition-all duration-300 hover:shadow-gold"
+                aria-label="Previous review"
+              >
+                <ChevronLeft size={24} />
+              </button>
+              <button
+                onClick={() => swiperRef.current?.slideNext()}
+                className="w-12 h-12 bg-accent-gold/10 hover:bg-accent-gold hover:text-primary-dark text-accent-gold rounded-full flex items-center justify-center transition-all duration-300 hover:shadow-gold"
+                aria-label="Next review"
+              >
+                <ChevronRight size={24} />
+              </button>
+            </div>
+          )}
         </motion.div>
 
         <motion.div
